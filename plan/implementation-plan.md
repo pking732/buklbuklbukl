@@ -13,14 +13,16 @@
 > Готово к Этапу 1. TODO в БД перед боевым запуском: задать реальные `payment_admin_id`,
 > `payment_requisites`, `support_username` (сейчас плейсхолдеры).
 
-## Этап 1 — Инфраструктура (🟩 параллельно, 4 агента)
-| Агент | Файлы | Зависит от |
+## Этап 1 — Инфраструктура ✅ ВЫПОЛНЕН (🟩 4 агента Sonnet, параллельно)
+| Агент | Файлы | Статус |
 |---|---|---|
-| A1 | `bot/config.py` (.env), `.env.example` | контракт env §3 |
-| A2 | `bot/db.py` (asyncpg pool) | миграция |
-| A3 | `bot/texts.py` (все тексты, BTN_*), `bot/states.py` | контракт §4 |
-| A4 | `bot/services/settings.py` | db |
-> Барьер: дождаться всех 4 перед Этапом 2.
+| A1 | `bot/config.py`, `.env.example` | ✅ 7 env-констант + validate() |
+| A2 | `bot/db.py` (asyncpg pool + хелперы) | ✅ init/close/pool/fetch/fetchrow/fetchval/execute |
+| A3 | `bot/texts.py` (тексты, BTN_*), `bot/states.py` | ✅ 7 кнопок, ~22 текста, BuyFlow(3 состояния) |
+| A4 | `bot/services/settings.py` | ✅ get/get_int/get_all/refresh + TTL-кэш |
+> Оркестратор добавил `bot/__init__.py`, `bot/services/__init__.py`, `bot/handlers/__init__.py`,
+> `requirements.txt`, `.gitignore`. Проверка: `py_compile` OK + сквозной импорт всех слоёв OK (venv).
+> Барьер пройден → готово к Этапу 2.
 
 ## Этап 2 — Сервисы (🟩 параллельно, но с правилом единой точки статуса)
 2.1 🟦 СНАЧАЛА `bot/services/vps_agent.py` (клиент агента) — от него зависят другие.
