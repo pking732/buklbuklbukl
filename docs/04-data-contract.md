@@ -71,6 +71,7 @@
 | tariff_code | TEXT | снапшот |
 | amount_rub | NUMERIC(10,2) | снапшот |
 | duration_days | INT | снапшот |
+| max_devices | INT | снапшот (нужен на approve для confirm_waiting) |
 | kind | TEXT | `purchase | extension` |
 | sender_name | TEXT | ФИО отправителя |
 | status | TEXT | `pending | approved | rejected` |

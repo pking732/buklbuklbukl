@@ -24,17 +24,16 @@
 > `requirements.txt`, `.gitignore`. Проверка: `py_compile` OK + сквозной импорт всех слоёв OK (venv).
 > Барьер пройден → готово к Этапу 2.
 
-## Этап 2 — Сервисы (🟩 параллельно, но с правилом единой точки статуса)
-2.1 🟦 СНАЧАЛА `bot/services/vps_agent.py` (клиент агента) — от него зависят другие.
-2.2 🟦 ЗАТЕМ `bot/services/subscriptions.py` — ЕДИНСТВЕННАЯ точка смены статуса.
-2.3 🟩 ПОТОМ параллельно:
-| Агент | Файл | Зависит от |
-|---|---|---|
-| B1 | `bot/services/payments.py` | subscriptions |
-| B2 | `bot/services/referrals.py` | subscriptions |
-| B3 | `bot/services/traffic.py` | vps_agent |
-> На сервере параллельно (🟩, отдельный агент S1): добавить `POST /vps/keys/traffic`
-> в `/opt/vps-agent/`, согласовать `VPS_AGENT_TOKEN`. Не ломать существующие эндпоинты.
+## Этап 2 — Сервисы ✅ ВЫПОЛНЕН (🟩 Sonnet-агенты)
+2.1 ✅ `bot/services/vps_agent.py` — клиент агента (create/disable/extend/status/health/get_traffic
+    + helper `device_key_id`/`telegram_id_from_key`). get_traffic gracefully = нули при отсутствии эндпоинта.
+2.2 ✅ `bot/services/subscriptions.py` — единая точка статуса (13 функций).
+2.3 ✅ параллельно: `payments.py` (+fraud_list), `referrals.py` (+progress/events/referred_by), `traffic.py`.
+> Контракт-фикс: добавлена колонка `payments.max_devices` (миграция `002`, docs/04 обновлён) —
+> снапшот нужен на approve для confirm_waiting. Проверка: py_compile + сквозной импорт всех
+> сервисов OK, имена колонок сверены со схемой.
+> ⏸ ОТЛОЖЕНО (требует правки прод-сервера, согласовать с пользователем): агент S1 —
+> `POST /vps/keys/traffic` в `/opt/vps-agent/`. До него сбор трафика возвращает нули (не падает).
 
 ## Этап 3 — Представление и входные точки (🟩 параллельно, 5 агентов)
 | Агент | Файлы | Зависит от |
