@@ -1,0 +1,16 @@
+[Unit]
+Description=buklproxy Telegram bot
+After=network-online.target vps-agent.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/buklbot
+ExecStart=/opt/buklbot/.venv/bin/python -m bot.main
+Restart=always
+RestartSec=5
+User=root
+# .env читается самим ботом через python-dotenv из WorkingDirectory.
+
+[Install]
+WantedBy=multi-user.target

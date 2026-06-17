@@ -57,7 +57,23 @@
 > Проверка: py_compile + полная сборка рантайма (Bot+Dispatcher 4 роутера, webhook-app
 > с route /agent/expire, scheduler с 2 джобами) без сетевого запуска — OK.
 
-## Этап 5 — Деплой и проверка (🟦 последовательно)
+## Этап 5 — Деплой и проверка 🟢 ЧАСТИЧНО (бот в проде и работает)
+✅ Код залит в `/opt/buklbot`, venv + зависимости, `.env` (BOT_TOKEN, BOT_USERNAME=buklproxy_bot,
+   PG_DSN=Session pooler 5432, VPS_AGENT_TOKEN общий с агентом, webhook 127.0.0.1:8081).
+✅ `EXPIRE_CALLBACK_URL` агента перенаправлен на `http://127.0.0.1:8081/agent/expire` (бэкап сделан),
+   агент перезапущен, health OK. (Старое значение вело на edge-функцию проекта lyvzbkzwpjtloxcmispj.)
+✅ `buklbot.service` (systemd) enable+start, бот в long-polling, обрабатывает апдейты, 409 нет.
+✅ Проверка БД в проде: /start пишет users/subscriptions/referral_progress; read-функции
+   (settings/tariffs/subscriptions/referrals) возвращают данные. ALL_DB_FUNCS_OK.
+⏳ ОСТАЛОСЬ:
+   - Реальные значения в `settings`: `payment_admin_id` (сейчас 0 → уведомления админу НЕ шлются!),
+     `payment_requisites`, `support_username`.
+   - S1: эндпоинт `/vps/keys/traffic` на агенте (сбор трафика пока возвращает нули).
+   - E2E оплаты: покупка → заявка → approve/reject (нужен payment_admin_id).
+   - (опц.) перенос секретов: сейчас .env создан вручную; репозиторий секретов не содержит.
+
+### Артефакты деплоя
+5.1 ✅ `deploy/buklbot.service`, `deploy/deploy.sh`.
 > Полная схема деплоя, runtime-архитектура и команды — в `file-mapping.md` §Деплой.
 5.1 Артефакты: `requirements.txt`, `.env.example`, `deploy/buklbot.service`, `deploy/deploy.sh`.
 5.2 Код на сервер в `/opt/buklbot/` (rsync), venv + `pip install`, заполнить `/opt/buklbot/.env`.
