@@ -48,12 +48,14 @@
 > Проверка: py_compile + импорт всех роутеров + сборка Dispatcher (4 роутера) + валидация
 > формат-плейсхолдеров текстов — OK. Каждый handler-модуль экспортирует `router`.
 
-## Этап 4 — Связки и фон (🟩 параллельно, затем сборка)
-| Агент | Файл |
-|---|---|
-| D1 | `bot/webhook_server.py` (/agent/expire) |
-| D2 | `bot/scheduler.py` (напоминания + трафик-джоб) |
-> 🟦 ЗАТЕМ `bot/main.py` — собирает polling + webhook + scheduler (один агент, после D1/D2).
+## Этап 4 — Связки и фон ✅ ВЫПОЛНЕН
+| Агент | Файл | Статус |
+|---|---|---|
+| D1 | `bot/webhook_server.py` (POST /agent/expire, Bearer, mark_expired + уведомление) | ✅ |
+| D2 | `bot/scheduler.py` (reminder_job 12ч, traffic_job 1ч) | ✅ |
+| — | `bot/main.py` (polling + webhook + scheduler, init/close pool) — оркестратор | ✅ |
+> Проверка: py_compile + полная сборка рантайма (Bot+Dispatcher 4 роутера, webhook-app
+> с route /agent/expire, scheduler с 2 джобами) без сетевого запуска — OK.
 
 ## Этап 5 — Деплой и проверка (🟦 последовательно)
 > Полная схема деплоя, runtime-архитектура и команды — в `file-mapping.md` §Деплой.
