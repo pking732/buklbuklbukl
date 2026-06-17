@@ -35,15 +35,18 @@
 > ⏸ ОТЛОЖЕНО (требует правки прод-сервера, согласовать с пользователем): агент S1 —
 > `POST /vps/keys/traffic` в `/opt/vps-agent/`. До него сбор трафика возвращает нули (не падает).
 
-## Этап 3 — Представление и входные точки (🟩 параллельно, 5 агентов)
-| Агент | Файлы | Зависит от |
+## Этап 3 — Представление и входные точки ✅ ВЫПОЛНЕН
+| Агент | Файлы | Статус |
 |---|---|---|
-| C0 | `bot/keyboards.py` (reply/inline, callback_data формат) | texts, tariffs |
-| C1 | `bot/handlers/start.py` | users, subscriptions, keyboards |
-| C2 | `bot/handlers/menu.py` (поддержка/мои ключи/рефералка) | settings, subscriptions, referrals |
-| C3 | `bot/handlers/payment.py` (FSM) | states, payments, keyboards |
-| C4 | `bot/handlers/admin.py` (approve/reject + реф-проверка) | payments, subscriptions, referrals |
-> C0 (keyboards) желательно первым — C1..C4 на него опираются. Затем C1..C4 параллельно.
+| — | `bot/services/users.py`, `bot/services/tariffs.py` (стык-сервисы, оркестратор) | ✅ |
+| C0 | `bot/keyboards.py` (reply/inline, callback_data `pay:approve/reject:<id>`, `ref:terms`) | ✅ |
+| C1 | `bot/handlers/start.py` (регистрация, deep-link реферер) | ✅ |
+| C2 | `bot/handlers/menu.py` (поддержка/мои ключи/рефералка, StateFilter(None)) | ✅ |
+| C3 | `bot/handlers/payment.py` (FSM BuyFlow, уведомление админу) | ✅ |
+| C4 | `bot/handlers/admin.py` (approve/reject + подарок рефереру) | ✅ |
+> Анти-конфликт: меню работает только в дефолтном состоянии; payment владеет BTN_BUY и FSM+Cancel.
+> Проверка: py_compile + импорт всех роутеров + сборка Dispatcher (4 роутера) + валидация
+> формат-плейсхолдеров текстов — OK. Каждый handler-модуль экспортирует `router`.
 
 ## Этап 4 — Связки и фон (🟩 параллельно, затем сборка)
 | Агент | Файл |
