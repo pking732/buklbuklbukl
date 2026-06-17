@@ -179,7 +179,7 @@ async def handle_sender_name(message: Message, state: FSMContext) -> None:
 
     # --- Создаём заявку и применяем (выдача / продление ключа внутри сервиса) ---
     res = await payments.create_and_apply(
-        tg=tg,
+        telegram_id=tg,
         tariff_code=data["tariff_code"],
         amount_rub=amount_value,
         duration_days=data["duration_days"],
