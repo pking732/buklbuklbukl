@@ -4,7 +4,7 @@
 
 from aiogram import F, Router
 from aiogram.filters import StateFilter
-from aiogram.types import Message, CallbackQuery
+from aiogram.types import Message, CallbackQuery, LinkPreviewOptions
 
 import bot.config as config
 import bot.texts as texts
@@ -46,9 +46,17 @@ async def handle_my_keys(message: Message) -> None:
         else:
             expires = "—"
 
+        instructions_url = await settings.get(
+            "instructions_url", "https://your.buklproxy.best:2096/install"
+        )
         await message.answer(
-            texts.MY_KEYS_ACTIVE.format(sub_url=sub["sub_url"], expires=expires),
+            texts.MY_KEYS_ACTIVE.format(
+                sub_url=sub["sub_url"],
+                expires=expires,
+                instructions_url=instructions_url,
+            ),
             parse_mode="HTML",
+            link_preview_options=LinkPreviewOptions(is_disabled=True),
         )
     else:
         await message.answer(texts.MY_KEYS_NONE, parse_mode="HTML")

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BUKL PROXY — подключение</title>
+<style>
+  :root { --bg:#0d1117; --card:#161b22; --accent:#f5b301; --text:#e6edf3; --muted:#8b949e; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--text);
+         font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif; line-height:1.55; }
+  .wrap { max-width:680px; margin:0 auto; padding:24px 18px 60px; }
+  .logo { display:block; max-width:200px; margin:8px auto 4px; }
+  h1 { text-align:center; font-size:26px; margin:8px 0 2px; }
+  .sub { text-align:center; color:var(--muted); margin:0 0 26px; }
+  .card { background:var(--card); border:1px solid #21262d; border-radius:14px;
+          padding:18px 18px; margin:14px 0; }
+  h2 { font-size:18px; margin:0 0 12px; }
+  .step { display:flex; gap:12px; margin:14px 0; align-items:flex-start; }
+  .num { flex:0 0 28px; height:28px; border-radius:50%; background:var(--accent); color:#000;
+         font-weight:700; display:flex; align-items:center; justify-content:center; }
+  .step p { margin:2px 0; }
+  .platforms { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  a.btn { display:block; text-align:center; text-decoration:none; padding:13px 10px;
+          border-radius:10px; background:var(--accent); color:#000; font-weight:700;
+          border:none; }
+  a.btn.alt { background:#21262d; color:var(--text); border:1px solid #30363d; }
+  .pill { display:inline-block; background:#21262d; border-radius:8px; padding:2px 8px;
+          font-family:monospace; color:var(--accent); }
+  .tip { color:var(--muted); font-size:14px; }
+  .center { text-align:center; }
+  footer { text-align:center; color:var(--muted); font-size:13px; margin-top:30px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <img class="logo" src="bukl.png" alt="BUKL PROXY">
+  <h1>Подключение к BUKL PROXY</h1>
+  <p class="sub">Быстрая настройка за пару минут через приложение Happ</p>
+
+  <div class="card">
+    <h2>1. Установите приложение Happ</h2>
+    <div class="platforms">
+      <a class="btn" href="https://play.google.com/store/apps/details?id=com.happproxy" target="_blank" rel="noopener">Android</a>
+      <a class="btn" href="https://apps.apple.com/app/happ-proxy-utility/id6504287215" target="_blank" rel="noopener">iPhone / iPad</a>
+      <a class="btn alt" href="https://github.com/Happ-proxy/happ-desktop/releases/latest" target="_blank" rel="noopener">Windows</a>
+      <a class="btn alt" href="https://github.com/Happ-proxy/happ-desktop/releases/latest" target="_blank" rel="noopener">macOS</a>
+    </div>
+    <p class="tip center" style="margin-top:12px;">
+      Все платформы и Linux/TV — на официальном сайте
+      <a href="https://www.happ.su/main/ru" target="_blank" rel="noopener" style="color:var(--accent)">happ.su</a>
+    </p>
+  </div>
+
+  <div class="card">
+    <h2>2. Добавьте свой ключ</h2>
+    <div class="step"><div class="num">1</div><p>Скопируйте свою ссылку-ключ из бота — раздел <b>«🔑 Мои ключи»</b>.</p></div>
+    <div class="step"><div class="num">2</div><p>Откройте приложение <b>Happ</b>.</p></div>
+    <div class="step"><div class="num">3</div><p>Нажмите <span class="pill">+</span> в правом верхнем углу.</p></div>
+    <div class="step"><div class="num">4</div><p>Выберите <b>«Вставить из буфера обмена»</b>.</p></div>
+    <div class="step"><div class="num">5</div><p>Ключ добавится. Выберите страну и нажмите <b>подключиться</b> — готово! 🎉</p></div>
+  </div>
+
+  <div class="card">
+    <h2>Нужна помощь?</h2>
+    <p class="tip">Если что-то не получается — напишите в поддержку, мы поможем.</p>
+  </div>
+
+  <footer>© BUKL PROXY</footer>
+</div>
+</body>
+</html>
