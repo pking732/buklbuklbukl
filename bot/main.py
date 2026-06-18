@@ -14,7 +14,7 @@ from aiogram.fsm.storage.memory import MemoryStorage
 
 import bot.config as config
 from bot import db, scheduler, webhook_server
-from bot.handlers import admin, menu, payment, start
+from bot.handlers import admin, import_admin, menu, payment, start
 
 logger = logging.getLogger(__name__)
 
@@ -37,6 +37,7 @@ async def main() -> None:
     dp = Dispatcher(storage=MemoryStorage())
     # Порядок важен: непересекающиеся триггеры, но FSM payment раньше меню.
     dp.include_router(start.router)
+    dp.include_router(import_admin.router)
     dp.include_router(payment.router)
     dp.include_router(menu.router)
     dp.include_router(admin.router)

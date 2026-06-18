@@ -15,3 +15,10 @@ class BuyFlow(StatesGroup):
 
     # Пользователь вводит ФИО отправителя платежа в свободном тексте
     entering_sender_name = State()
+
+
+class ImportFlow(StatesGroup):
+    """Админский импорт существующих клиентов из Excel-файла."""
+
+    # Админ вызвал /import и должен прислать .xlsx
+    waiting_file = State()

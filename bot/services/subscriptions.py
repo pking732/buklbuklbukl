@@ -166,6 +166,49 @@ async def confirm_waiting(
     )
 
 
+async def grant_until(
+    telegram_id: int,
+    expires_at: datetime,
+    max_devices: int,
+) -> asyncpg.Record:
+    """
+    Выдать активный доступ до ЯВНОЙ даты expires_at (миграция/импорт существующих
+    клиентов). Создаём ключ на VPS, затем upsert строки subscriptions в 'active'.
+    Идемпотентно: если строки нет — создаём, если есть — обновляем.
+    """
+    dk = vps_agent.device_key_id(telegram_id)
+    now = datetime.now(timezone.utc)
+
+    # 1. Сначала агент (create_key идемпотентен на стороне агента)
+    result = await vps_agent.create_key(dk, expires_at, max_devices)
+
+    # 2. Затем БД (upsert)
+    return await db.fetchrow(
+        """
+        INSERT INTO subscriptions
+            (telegram_id, status, device_key_id, sub_url, sub_token,
+             max_devices, expires_at, notified_expiring, created_at, updated_at)
+        VALUES ($1, 'active', $2, $3, $4, $5, $6, false, $7, $7)
+        ON CONFLICT (telegram_id) DO UPDATE SET
+            status            = 'active',
+            sub_url           = EXCLUDED.sub_url,
+            sub_token         = EXCLUDED.sub_token,
+            max_devices       = EXCLUDED.max_devices,
+            expires_at        = EXCLUDED.expires_at,
+            notified_expiring = false,
+            updated_at        = EXCLUDED.updated_at
+        RETURNING *
+        """,
+        telegram_id,
+        dk,
+        result["subUrl"],
+        result["subToken"],
+        max_devices,
+        expires_at,
+        now,
+    )
+
+
 # ---------------------------------------------------------------------------
 # Продление
 # ---------------------------------------------------------------------------
