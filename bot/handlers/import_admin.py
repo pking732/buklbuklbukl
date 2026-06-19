@@ -9,16 +9,17 @@ from __future__ import annotations
 
 import io
 import logging
+from datetime import datetime, timezone
 
 from aiogram import Router, F
-from aiogram.filters import Command, StateFilter
+from aiogram.filters import Command, CommandObject, StateFilter
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message
 
 import bot.texts as texts
 from bot import keyboards
 from bot.states import ImportFlow
-from bot.services import settings, import_clients
+from bot.services import settings, import_clients, users, subscriptions, referrals
 
 logger = logging.getLogger(__name__)
 router = Router()
@@ -27,6 +28,63 @@ router = Router()
 async def _is_admin(telegram_id: int) -> bool:
     admin_id = await settings.get_int("payment_admin_id", 0)
     return admin_id != 0 and telegram_id == admin_id
+
+
+@router.message(Command("grant"), StateFilter(None))
+async def cmd_grant(message: Message, command: CommandObject) -> None:
+    """
+    Выдать доступ вручную: /grant <username|telegram_id> <дата ДД.ММ.ГГГГ>.
+    Активирует подписку и создаёт ключ, действующий до указанной даты.
+    Только для платёжного администратора.
+    """
+    if not await _is_admin(message.from_user.id):  # type: ignore[union-attr]
+        await message.answer(texts.IMPORT_NOT_ADMIN)
+        return
+
+    args = (command.args or "").split()
+    if len(args) < 2:
+        await message.answer(texts.GRANT_USAGE)
+        return
+
+    user_token = args[0]
+    date_token = args[-1]
+
+    # --- Определяем telegram_id ---
+    username: str | None = None
+    if user_token.startswith("@") or not user_token.isdigit():
+        row = await users.find_by_username(user_token)
+        if row is None:
+            await message.answer(texts.GRANT_NOT_FOUND.format(user=user_token))
+            return
+        telegram_id = row["telegram_id"]
+        username = row["username"]
+    else:
+        telegram_id = int(user_token)
+
+    # --- Парсим дату ---
+    exp = import_clients._parse_date(date_token)
+    if exp is None:
+        await message.answer(texts.GRANT_BAD_DATE)
+        return
+    if exp <= datetime.now(timezone.utc):
+        await message.answer(texts.GRANT_PAST_DATE)
+        return
+
+    # --- Выдаём доступ ---
+    await users.ensure_exists(telegram_id, username)
+    await referrals.ensure_progress(telegram_id)
+    await subscriptions.grant_until(telegram_id, exp, import_clients.DEFAULT_MAX_DEVICES)
+
+    date_str = exp.strftime("%d.%m.%Y")
+    await message.answer(texts.GRANT_OK.format(tg=telegram_id, date=date_str))
+
+    # Уведомляем пользователя (если он писал боту)
+    try:
+        await message.bot.send_message(
+            telegram_id, texts.GRANT_USER_NOTIFY.format(date=date_str)
+        )
+    except Exception as e:  # noqa: BLE001
+        logger.info("grant: не удалось уведомить %s: %s", telegram_id, e)
 
 
 @router.message(Command("import"), StateFilter(None))

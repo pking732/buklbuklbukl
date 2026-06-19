@@ -61,3 +61,30 @@ async def get_username(telegram_id: int) -> str | None:
         "SELECT username FROM users WHERE telegram_id = $1",
         telegram_id,
     )
+
+
+async def find_by_username(username: str) -> asyncpg.Record | None:
+    """
+    Найти пользователя по username (без учёта регистра, без @).
+    Работает только если пользователь уже взаимодействовал с ботом (есть в users).
+    """
+    uname = username.lstrip("@")
+    return await db.fetchrow(
+        "SELECT * FROM users WHERE lower(username) = lower($1) ORDER BY created_at LIMIT 1",
+        uname,
+    )
+
+
+async def ensure_exists(telegram_id: int, username: str | None = None) -> None:
+    """
+    Гарантировать наличие строки users (для админской выдачи доступа по telegram_id).
+    НЕ перезатирает существующие поля (ON CONFLICT DO NOTHING).
+    """
+    await db.execute(
+        """
+        INSERT INTO users (telegram_id, username, created_at, last_start_at)
+        VALUES ($1, $2, now(), now())
+        ON CONFLICT (telegram_id) DO NOTHING
+        """,
+        telegram_id, username,
+    )
